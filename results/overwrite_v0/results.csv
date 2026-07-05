@@ -1,0 +1,5 @@
+condition,bit_accuracy_A,bit_accuracy_B
+A_only,100.0,52.08
+B_only,52.08,100.0
+A_transcode,100.0,52.08
+A_then_B,58.33,83.33
