@@ -1,0 +1,17 @@
+{
+  "1": {
+    "parent": 0,
+    "step": 1,
+    "actor": "A"
+  },
+  "2": {
+    "parent": 1,
+    "step": 2,
+    "actor": "B"
+  },
+  "3": {
+    "parent": 2,
+    "step": 3,
+    "actor": "C"
+  }
+}

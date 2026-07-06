@@ -1,0 +1,5 @@
+condition,frames,raw_bit_accuracy_pct,decoded_current_id,decoded_parent_id,expected_current_id,expected_parent_id,current_id_correct,parent_id_correct,check_valid,latest_token_correct,reconstructed_chain,chain_valid,chain_note
+A,256,98.96,1,0,1,0,True,True,True,True,A,True,
+AB,256,81.25,2,1,2,1,True,True,True,True,A -> B,True,
+ABC,256,77.08,3,0,3,2,True,False,True,False,,False,parent ID does not match registry
+ABC_transcode,256,77.08,3,0,3,2,True,False,True,False,,False,parent ID does not match registry

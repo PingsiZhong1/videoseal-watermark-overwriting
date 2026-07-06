@@ -1,0 +1,25 @@
+Slot-based multi-watermark training prototype
+
+Design
+- The 96-bit payload was divided into three ordered 32-bit slots.
+- The training objective used sequential states A, A+B, and A+B+C.
+- The final decoder was expected to recover all active slots directly.
+
+Environment
+- Apple M2 Pro
+- MPS device
+- Official VideoSeal v0.0 checkpoint
+- One official example video
+- 20 training steps
+
+Implementation note
+- The default mixed mask module caused inconsistent Tensor/NumPy errors.
+- It was replaced with NoMaskEmbedder for the local smoke-training prototype.
+
+Initial result
+- The training path, backpropagation, and checkpoint saving ran successfully.
+- The 20-step single-video run did not stably recover all active slots.
+- This is an implementation prototype, not evidence that multi-watermark coexistence has been solved.
+
+Next requirement
+- Multi-video data, longer training, and explicit loss terms that protect earlier slots.

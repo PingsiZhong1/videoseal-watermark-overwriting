@@ -1,0 +1,101 @@
+{
+  "A": {
+    "full_message_matches": 36,
+    "full_message_bits": 96,
+    "slots": [
+      {
+        "slot": 1,
+        "decoded_present": 0,
+        "expected_present": 1,
+        "token_matches": 12,
+        "token_bits": 31,
+        "slot_matches": 12,
+        "slot_bits": 32
+      },
+      {
+        "slot": 2,
+        "decoded_present": 1,
+        "expected_present": 0,
+        "token_matches": 12,
+        "token_bits": 31,
+        "slot_matches": 12,
+        "slot_bits": 32
+      },
+      {
+        "slot": 3,
+        "decoded_present": 1,
+        "expected_present": 0,
+        "token_matches": 12,
+        "token_bits": 31,
+        "slot_matches": 12,
+        "slot_bits": 32
+      }
+    ]
+  },
+  "AB": {
+    "full_message_matches": 80,
+    "full_message_bits": 96,
+    "slots": [
+      {
+        "slot": 1,
+        "decoded_present": 1,
+        "expected_present": 1,
+        "token_matches": 28,
+        "token_bits": 31,
+        "slot_matches": 29,
+        "slot_bits": 32
+      },
+      {
+        "slot": 2,
+        "decoded_present": 1,
+        "expected_present": 1,
+        "token_matches": 26,
+        "token_bits": 31,
+        "slot_matches": 27,
+        "slot_bits": 32
+      },
+      {
+        "slot": 3,
+        "decoded_present": 1,
+        "expected_present": 0,
+        "token_matches": 24,
+        "token_bits": 31,
+        "slot_matches": 24,
+        "slot_bits": 32
+      }
+    ]
+  },
+  "ABC": {
+    "full_message_matches": 84,
+    "full_message_bits": 96,
+    "slots": [
+      {
+        "slot": 1,
+        "decoded_present": 0,
+        "expected_present": 1,
+        "token_matches": 30,
+        "token_bits": 31,
+        "slot_matches": 30,
+        "slot_bits": 32
+      },
+      {
+        "slot": 2,
+        "decoded_present": 1,
+        "expected_present": 1,
+        "token_matches": 26,
+        "token_bits": 31,
+        "slot_matches": 27,
+        "slot_bits": 32
+      },
+      {
+        "slot": 3,
+        "decoded_present": 1,
+        "expected_present": 1,
+        "token_matches": 26,
+        "token_bits": 31,
+        "slot_matches": 27,
+        "slot_bits": 32
+      }
+    ]
+  }
+}

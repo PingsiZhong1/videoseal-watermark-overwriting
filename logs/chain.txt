@@ -1,0 +1,21 @@
+Pilot chained-watermark experiments
+
+chain.py
+- A and A -> B were recovered correctly.
+- In A -> B -> C, the latest ID and step were recovered, but the parent ID was decoded as 0 instead of 2.
+- The chain could not be verified.
+
+chain2.py
+- Increased redundancy for the parent ID and added a simple XOR consistency check.
+- The three-step parent ID error remained.
+- The simple check did not identify the incorrect parent reference.
+
+chain3.py
+- Used one full 96-bit codeword to represent the latest record ID.
+- The external registry stored the parent relation.
+- A, A -> B, and A -> B -> C were classified correctly.
+- The registry reconstructed A -> B -> C after sequential embedding and H.264 transcoding.
+
+Limitation
+- chain3 reconstructs provenance from the latest record ID.
+- It does not preserve A, B, and C as separately decodable independent watermarks.

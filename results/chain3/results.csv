@@ -1,0 +1,5 @@
+condition,frames,expected_record_id,expected_actor,decoded_record_id,decoded_actor,record_correct,bit_accuracy_vs_expected_pct,distance_to_A,distance_to_B,distance_to_C,best_distance,runner_up_distance,decision_margin,registry_chain
+A,256,1,A,1,A,True,95.83,4,92,50,4,50,46,A
+AB,256,2,B,2,B,True,65.62,63,33,49,33,49,16,A -> B
+ABC,256,3,C,3,C,True,84.38,55,41,15,15,41,26,A -> B -> C
+ABC_transcode,256,3,C,3,C,True,84.38,55,41,15,15,41,26,A -> B -> C

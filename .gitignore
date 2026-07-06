@@ -221,3 +221,23 @@ __marimo__/
 *.mp4
 *.mov
 .DS_Store
+
+# Training checkpoints
+*.pt
+*.pth
+
+# Local diagnostic outputs
+results/chain/decoded_*.txt
+results/chain/logical_*.txt
+results/chain/token_*.txt
+results/chain2/decoded_*.txt
+results/chain2/fields_*.txt
+results/chain2/token_*.txt
+results/chain3/decoded_*.txt
+
+# Local smoke-test runs
+results/multi_base/
+results/multi_base_test/
+results/multi_check/
+results/multi_smoke/
+results/multi_smoke_test/
