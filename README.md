@@ -1,12 +1,10 @@
 # VideoSeal Watermark Overwriting Study
 
-This project reproduces the VideoSeal video watermarking pipeline and examines whether a later watermark weakens or replaces an earlier one at the decoding level.
+This project reproduces the VideoSeal watermarking pipeline and explores whether sequential watermark embedding weakens earlier watermarks.
 
-## Base Implementation
+Official implementation: https://github.com/facebookresearch/videoseal
 
-Official repository: https://github.com/facebookresearch/videoseal
-
-The experiment uses the legacy `videoseal_0.0` checkpoint with a 96-bit payload.
+The experiments use the legacy `videoseal_0.0` checkpoint with a 96-bit payload.
 
 ## Environment
 
@@ -16,74 +14,121 @@ The experiment uses the legacy `videoseal_0.0` checkpoint with a 96-bit payload.
 - PyTorch: 2.4.0
 - FFmpeg / ffprobe installed through conda-forge
 
-## Reproduction
+## 1. Reproduction
 
-I first ran the official streaming inference pipeline:
+I first ran the official streaming inference pipeline and verified that the 96-bit legacy checkpoint could embed and recover a watermark.
 
 ```bash
 python inference_streaming.py --input assets/videos/1.mp4 --output_dir outputs/
 ```
 
-To reproduce the 96-bit setting, I changed the model loading line from:
-
-```python
-videoseal.load("videoseal")
-```
-
-to:
+For the legacy paper setting, the model was loaded with:
 
 ```python
 videoseal.load("videoseal_0.0")
 ```
 
-The resulting message file contained 96 bits.
+## 2. Watermark Overwriting Experiment
 
-## Overwriting Experiment
+`scripts/overwrite_experiment_v0.py` tests controlled sequential embedding with two fixed complementary messages.
 
-`scripts/overwrite_experiment_v0.py` keeps the official embedding and detection functions unchanged, but adds a controlled sequential-watermark experiment.
+Conditions:
 
-The script uses two fixed, bitwise complementary messages:
+- `A_only`
+- `B_only`
+- `A_transcode`
+- `A_then_A`
+- `A_then_B`
+- `B_then_A`
 
-- A: first watermark
-- B: second watermark
-- Every decoded bit matches either A or B, allowing the final output to be compared directly with the earlier and later messages.
+Key result:
 
-It evaluates:
+- H.264 transcoding alone preserved watermark A.
+- Embedding A twice also preserved A.
+- After `A_then_B`, 70 of 96 decoded bits matched later watermark B.
+- After `B_then_A`, 72 of 96 decoded bits matched later watermark A.
 
-- `A_only`: embed A once
-- `B_only`: embed B once
-- `A_transcode`: embed A, then apply H.264 transcoding
-- `A_then_A`: embed A twice
-- `A_then_B`: embed A, then embed B
-- `B_then_A`: embed B, then embed A
+This provides preliminary evidence that a later, different watermark can dominate the final decoded message.
 
-Run the experiment with:
+Results: `results/overwrite_v0/`
 
-```bash
-conda activate videoseal
+## 3. Chained Watermarking Prototypes
 
-python scripts/overwrite_experiment_v0.py \
-  --input ~/Projects/videoseal/assets/videos/1.mp4 \
-  --output_dir results/overwrite_v0 \
-  --official_repo ~/Projects/videoseal \
-  --seed 2025 \
-  --crf 23
+### Direct chain token
+
+`scripts/chain.py` stores:
+
+```text
+current ID | parent ID | step
 ```
 
-## Preliminary Result
+It recovered `A -> B`, but after `A -> B -> C`, one parent-ID error prevented chain verification.
 
-The baseline and control conditions recovered the intended watermark completely:
+`scripts/chain2.py` added more redundancy for the parent field and a simple consistency check. The three-step parent-ID error remained.
 
-- `A_only`: 96 / 96 bits matched A
-- `B_only`: 96 / 96 bits matched B
-- `A_transcode`: 96 / 96 bits matched A
-- `A_then_A`: 96 / 96 bits matched A
+### Pointer-based chain
 
-When different watermarks were embedded sequentially, decoding shifted toward the later watermark:
+`scripts/chain3.py` uses one full 96-bit codeword for the latest record ID. The parent relationship is stored in an external registry.
 
-- `A_then_B`: 70 / 96 bits matched later watermark B
-- `B_then_A`: 72 / 96 bits matched later watermark A
+```text
+Recovered latest record ID
+→ lookup registry
+→ reconstruct A -> B -> C
+```
 
-These results suggest that a later, different watermark can partially replace an earlier watermark at the decoding level. The earlier watermark remains partially recoverable, so this does not demonstrate complete removal.
+In the current pilot run, `A`, `A -> B`, `A -> B -> C`, and `A -> B -> C -> H.264 transcode` were classified correctly.
 
-Generated MP4 files are kept locally and ignored by Git. The repository stores scripts, fixed messages, logs, decoded bit strings, and CSV results.
+This is a provenance reconstruction prototype. It does not preserve A, B, and C as independently decodable watermarks in the final video.
+
+Results: `results/chain3/`
+
+## 4. Multi-Slot Training Prototype
+
+`scripts/multi.py` is a model-level prototype for direct multi-watermark recovery.
+
+The 96-bit payload is divided into three ordered 32-bit slots:
+
+```text
+Slot 1: A
+Slot 2: B
+Slot 3: C
+```
+
+The training sequence is:
+
+```text
+original -> A
+A-watermarked video -> A + B
+A + B-watermarked video -> A + B + C
+```
+
+The local training path, backpropagation, and checkpoint saving ran successfully.
+
+A 20-step run on one video did not yet recover all active slots reliably. This is an implementation prototype, not evidence that multi-watermark coexistence has been solved.
+
+Results: `results/multi_20/` and `results/multi_20_test/`
+
+## Repository Structure
+
+```text
+scripts/
+  overwrite_experiment_v0.py
+  chain.py
+  chain2.py
+  chain3.py
+  multi.py
+
+logs/
+  overwrite_v0.txt
+  chain.txt
+  multi.txt
+
+results/
+  overwrite_v0/
+  chain/
+  chain2/
+  chain3/
+  multi_20/
+```
+
+Generated videos and training checkpoints are kept locally and ignored by Git.
