@@ -1,18 +1,48 @@
-Model: VideoSeal v0.0, 96-bit legacy checkpoint
+Model: VideoSeal v0.0 legacy checkpoint
+Payload: 96 bits
 Input: official assets/videos/1.mp4
 Device: CPU
-CRF: 23
-Chunk size: 16
-Message A seed: 2025
-Message B seed: 2026
+Chunk size: 16 frames
+H.264 CRF: 23
+Message seed: 2025
+Message design: A and B are bitwise complementary
+
+Conditions:
+- A_only: original video -> A
+- B_only: original video -> B
+- A_transcode: original video -> A -> H.264 transcode
+- A_then_A: original video -> A -> A
+- A_then_B: original video -> A -> B
+- B_then_A: original video -> B -> A
 
 Results:
-A_only: A=100.00%, B=52.08%
-B_only: A=52.08%, B=100.00%
-A_transcode: A=100.00%, B=52.08%
-A_then_B: A=58.33%, B=83.33%
+A_only:
+- A match: 100.00% (96 / 96)
+- B match: 0.00% (0 / 96)
+
+B_only:
+- A match: 0.00% (0 / 96)
+- B match: 100.00% (96 / 96)
+
+A_transcode:
+- A match: 100.00% (96 / 96)
+- B match: 0.00% (0 / 96)
+
+A_then_A:
+- A match: 100.00% (96 / 96)
+- B match: 0.00% (0 / 96)
+
+A_then_B:
+- A match: 27.08% (26 / 96)
+- B match: 72.92% (70 / 96)
+- Final decoding preference: B
+
+B_then_A:
+- A match: 75.00% (72 / 96)
+- B match: 25.00% (24 / 96)
+- Final decoding preference: A
 
 Observation:
-The H.264 transcode control preserved watermark A at 100.00%.
-After embedding watermark B into the A-watermarked video, recovery of A dropped to 58.33%, while B was recovered at 83.33%.
-This provides preliminary evidence of watermark interference or partial overwriting.
+H.264 transcoding alone did not weaken the first watermark, and embedding the same watermark twice also preserved it completely.
+
+When a different second watermark was embedded, the final decoded bits shifted toward the later watermark. This indicates partial replacement at the decoding level rather than complete removal of the earlier watermark.

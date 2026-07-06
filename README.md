@@ -1,12 +1,12 @@
 # VideoSeal Watermark Overwriting Study
 
-This project reproduces the VideoSeal video watermarking pipeline and tests whether a later watermark interferes with an earlier one.
+This project reproduces the VideoSeal video watermarking pipeline and examines whether a later watermark weakens or replaces an earlier one at the decoding level.
 
 ## Base Implementation
 
 Official repository: https://github.com/facebookresearch/videoseal
 
-The experiment uses the legacy `videoseal_0.0` checkpoint with a 96-bit payload, corresponding to the 2024 VideoSeal paper.
+The experiment uses the legacy `videoseal_0.0` checkpoint with a 96-bit payload.
 
 ## Environment
 
@@ -16,26 +16,6 @@ The experiment uses the legacy `videoseal_0.0` checkpoint with a 96-bit payload,
 - PyTorch: 2.4.0
 - FFmpeg / ffprobe installed through conda-forge
 
-## Setup
-
-Clone the official repository separately:
-
-```bash
-git clone https://github.com/facebookresearch/videoseal.git
-cd videoseal
-```
-
-Create the environment and install dependencies:
-
-```bash
-conda create -n videoseal python=3.10 -y
-conda activate videoseal
-
-conda install pytorch==2.4.0 torchvision==0.19.0 torchaudio==2.4.0 -c pytorch -y
-python -m pip install -r requirements.txt
-conda install -c conda-forge ffmpeg -y
-```
-
 ## Reproduction
 
 I first ran the official streaming inference pipeline:
@@ -44,7 +24,7 @@ I first ran the official streaming inference pipeline:
 python inference_streaming.py --input assets/videos/1.mp4 --output_dir outputs/
 ```
 
-The default script loads the current VideoSeal model. To match the paper setting, I copied the script and changed:
+To reproduce the 96-bit setting, I changed the model loading line from:
 
 ```python
 videoseal.load("videoseal")
@@ -60,34 +40,50 @@ The resulting message file contained 96 bits.
 
 ## Overwriting Experiment
 
-`scripts/overwrite_experiment_v0.py` uses two fixed messages:
+`scripts/overwrite_experiment_v0.py` keeps the official embedding and detection functions unchanged, but adds a controlled sequential-watermark experiment.
+
+The script uses two fixed, bitwise complementary messages:
 
 - A: first watermark
 - B: second watermark
+- Every decoded bit matches either A or B, allowing the final output to be compared directly with the earlier and later messages.
 
-It compares four conditions:
+It evaluates:
 
-- A only
-- B only
-- A followed by H.264 transcoding
-- A followed by B
+- `A_only`: embed A once
+- `B_only`: embed B once
+- `A_transcode`: embed A, then apply H.264 transcoding
+- `A_then_A`: embed A twice
+- `A_then_B`: embed A, then embed B
+- `B_then_A`: embed B, then embed A
 
-Run the experiment from this repository:
+Run the experiment with:
 
 ```bash
 conda activate videoseal
 
 python scripts/overwrite_experiment_v0.py \
   --input ~/Projects/videoseal/assets/videos/1.mp4 \
-  --output_dir results/overwrite_v0
+  --output_dir results/overwrite_v0 \
+  --official_repo ~/Projects/videoseal \
+  --seed 2025 \
+  --crf 23
 ```
-
-The script saves the fixed messages and result CSV in `results/overwrite_v0/`. Generated MP4 files are kept locally and ignored by Git.
 
 ## Preliminary Result
 
-Watermark A was recovered at 100% after the first embedding and remained at 100% after the H.264 transcode control.
+The baseline and control conditions recovered the intended watermark completely:
 
-After watermark B was embedded into the A-watermarked video, recovery of A fell to 58.33%, while B was recovered at 83.33%.
+- `A_only`: 96 / 96 bits matched A
+- `B_only`: 96 / 96 bits matched B
+- `A_transcode`: 96 / 96 bits matched A
+- `A_then_A`: 96 / 96 bits matched A
 
-This suggests substantial watermark interference or partial overwriting rather than loss caused by re-encoding alone.
+When different watermarks were embedded sequentially, decoding shifted toward the later watermark:
+
+- `A_then_B`: 70 / 96 bits matched later watermark B
+- `B_then_A`: 72 / 96 bits matched later watermark A
+
+These results suggest that a later, different watermark can partially replace an earlier watermark at the decoding level. The earlier watermark remains partially recoverable, so this does not demonstrate complete removal.
+
+Generated MP4 files are kept locally and ignored by Git. The repository stores scripts, fixed messages, logs, decoded bit strings, and CSV results.
