@@ -220,11 +220,20 @@ __marimo__/
 # Local experiment outputs
 *.mp4
 *.mov
+*.mkv
+*.avi
+*.log
+results/**/log/
+results/**/logs/
+results/**/frames/
+results/**/frame_*.png
 .DS_Store
 
 # Training checkpoints
 *.pt
 *.pth
+checkpoints/
+ckpts/
 
 # Local diagnostic outputs
 results/chain/decoded_*.txt

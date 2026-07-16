@@ -1,0 +1,868 @@
+{
+  "experiment": "96-bit prior-watermark augmentation training",
+  "training_design": {
+    "prior_model": "frozen VideoSeal v0.0 embedder",
+    "trainable_component": "fresh-watermark embedder only",
+    "detector": "frozen",
+    "payload_bits": 96,
+    "prior_probability": 1.0,
+    "full_conflict_probability": 1.0,
+    "loss": "video-level signed-margin loss(fresh B) + hard_bit_weight * hardest-k-bit loss + frame_loss_weight * frame BCE(fresh B) + lambda_image * squared excess over the target-PSNR MSE budget",
+    "video_forward": "differentiable VideoSeal temporal propagation; training matches the unaugmented overwrite evaluation path",
+    "target_psnr": 40.0,
+    "decode_margin": 1.0,
+    "frame_loss_weight": 0.25,
+    "hard_bit_k": 8,
+    "hard_bit_weight": 1.0,
+    "message_pairs_per_step": 4,
+    "checkpoint_selection_message_pairs": 20,
+    "checkpoint_selection_seed": 2002029,
+    "max_grad_norm": 1.0,
+    "fresh_strength": 2.0,
+    "fixed_training_pair": false,
+    "resume_checkpoint": "results/prior_aug_three_changes_50/checkpoint_prior_aug_96bit.pth",
+    "start_step": 50,
+    "final_step": 100,
+    "training_frames": 16,
+    "evaluation_frames": 5
+  },
+  "baseline_before_training": {
+    "payload_bits": 96,
+    "A_only_decoded_as_A": {
+      "frame_bit_accuracy_pct": 96.25,
+      "aggregate_correct_bits": 93,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 96.88,
+      "complete_96bit": false
+    },
+    "B_only_decoded_as_B": {
+      "frame_bit_accuracy_pct": 99.37,
+      "aggregate_correct_bits": 96,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 100.0,
+      "complete_96bit": true
+    },
+    "A_then_B_decoded_as_old_A": {
+      "frame_bit_accuracy_pct": 0.21,
+      "aggregate_correct_bits": 0,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 0.0,
+      "complete_96bit": false
+    },
+    "A_then_B_decoded_as_fresh_B": {
+      "frame_bit_accuracy_pct": 99.79,
+      "aggregate_correct_bits": 96,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 100.0,
+      "complete_96bit": true
+    },
+    "fresh_watermark_PSNR_vs_A_input": 46.523
+  },
+  "after_training": {
+    "payload_bits": 96,
+    "A_only_decoded_as_A": {
+      "frame_bit_accuracy_pct": 96.25,
+      "aggregate_correct_bits": 93,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 96.88,
+      "complete_96bit": false
+    },
+    "B_only_decoded_as_B": {
+      "frame_bit_accuracy_pct": 99.79,
+      "aggregate_correct_bits": 96,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 100.0,
+      "complete_96bit": true
+    },
+    "A_then_B_decoded_as_old_A": {
+      "frame_bit_accuracy_pct": 0.0,
+      "aggregate_correct_bits": 0,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 0.0,
+      "complete_96bit": false
+    },
+    "A_then_B_decoded_as_fresh_B": {
+      "frame_bit_accuracy_pct": 100.0,
+      "aggregate_correct_bits": 96,
+      "aggregate_total_bits": 96,
+      "aggregate_bit_accuracy_pct": 100.0,
+      "complete_96bit": true
+    },
+    "fresh_watermark_PSNR_vs_A_input": 45.915
+  },
+  "held_out_random_message_evaluation": {
+    "message_pair_design": "random A; B is the bitwise complement of A",
+    "messages_used_in_training": false,
+    "baseline_before_training": {
+      "message_pair_count": 20,
+      "complete_96bit_successes": 6,
+      "complete_96bit_success_rate_pct": 30.0,
+      "mean_bit_accuracy_pct": 98.075,
+      "minimum_bit_accuracy_pct": 91.67,
+      "mean_PSNR_vs_A_input": 46.668,
+      "per_pair": [
+        {
+          "pair": 1,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.198
+        },
+        {
+          "pair": 2,
+          "fresh_B_correct_bits": 94,
+          "fresh_B_bit_accuracy_pct": 97.92,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.757
+        },
+        {
+          "pair": 3,
+          "fresh_B_correct_bits": 93,
+          "fresh_B_bit_accuracy_pct": 96.88,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.777
+        },
+        {
+          "pair": 4,
+          "fresh_B_correct_bits": 93,
+          "fresh_B_bit_accuracy_pct": 96.88,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.363
+        },
+        {
+          "pair": 5,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 47.12
+        },
+        {
+          "pair": 6,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.46
+        },
+        {
+          "pair": 7,
+          "fresh_B_correct_bits": 94,
+          "fresh_B_bit_accuracy_pct": 97.92,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.471
+        },
+        {
+          "pair": 8,
+          "fresh_B_correct_bits": 92,
+          "fresh_B_bit_accuracy_pct": 95.83,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.608
+        },
+        {
+          "pair": 9,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.793
+        },
+        {
+          "pair": 10,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.85
+        },
+        {
+          "pair": 11,
+          "fresh_B_correct_bits": 92,
+          "fresh_B_bit_accuracy_pct": 95.83,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.92
+        },
+        {
+          "pair": 12,
+          "fresh_B_correct_bits": 88,
+          "fresh_B_bit_accuracy_pct": 91.67,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.133
+        },
+        {
+          "pair": 13,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 47.078
+        },
+        {
+          "pair": 14,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.954
+        },
+        {
+          "pair": 15,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.881
+        },
+        {
+          "pair": 16,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 47.013
+        },
+        {
+          "pair": 17,
+          "fresh_B_correct_bits": 93,
+          "fresh_B_bit_accuracy_pct": 96.88,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.179
+        },
+        {
+          "pair": 18,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.182
+        },
+        {
+          "pair": 19,
+          "fresh_B_correct_bits": 93,
+          "fresh_B_bit_accuracy_pct": 96.88,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.856
+        },
+        {
+          "pair": 20,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.767
+        }
+      ]
+    },
+    "after_training": {
+      "message_pair_count": 20,
+      "complete_96bit_successes": 7,
+      "complete_96bit_success_rate_pct": 35.0,
+      "mean_bit_accuracy_pct": 98.282,
+      "minimum_bit_accuracy_pct": 91.67,
+      "mean_PSNR_vs_A_input": 46.096,
+      "per_pair": [
+        {
+          "pair": 1,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 45.637
+        },
+        {
+          "pair": 2,
+          "fresh_B_correct_bits": 94,
+          "fresh_B_bit_accuracy_pct": 97.92,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.147
+        },
+        {
+          "pair": 3,
+          "fresh_B_correct_bits": 93,
+          "fresh_B_bit_accuracy_pct": 96.88,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.225
+        },
+        {
+          "pair": 4,
+          "fresh_B_correct_bits": 94,
+          "fresh_B_bit_accuracy_pct": 97.92,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.803
+        },
+        {
+          "pair": 5,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.556
+        },
+        {
+          "pair": 6,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.894
+        },
+        {
+          "pair": 7,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.914
+        },
+        {
+          "pair": 8,
+          "fresh_B_correct_bits": 92,
+          "fresh_B_bit_accuracy_pct": 95.83,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.989
+        },
+        {
+          "pair": 9,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.219
+        },
+        {
+          "pair": 10,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.265
+        },
+        {
+          "pair": 11,
+          "fresh_B_correct_bits": 92,
+          "fresh_B_bit_accuracy_pct": 95.83,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.36
+        },
+        {
+          "pair": 12,
+          "fresh_B_correct_bits": 88,
+          "fresh_B_bit_accuracy_pct": 91.67,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.585
+        },
+        {
+          "pair": 13,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.485
+        },
+        {
+          "pair": 14,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.348
+        },
+        {
+          "pair": 15,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.341
+        },
+        {
+          "pair": 16,
+          "fresh_B_correct_bits": 96,
+          "fresh_B_bit_accuracy_pct": 100.0,
+          "fresh_B_complete_96bit": true,
+          "PSNR_vs_A_input": 46.465
+        },
+        {
+          "pair": 17,
+          "fresh_B_correct_bits": 93,
+          "fresh_B_bit_accuracy_pct": 96.88,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.623
+        },
+        {
+          "pair": 18,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 45.64
+        },
+        {
+          "pair": 19,
+          "fresh_B_correct_bits": 94,
+          "fresh_B_bit_accuracy_pct": 97.92,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.271
+        },
+        {
+          "pair": 20,
+          "fresh_B_correct_bits": 95,
+          "fresh_B_bit_accuracy_pct": 98.96,
+          "fresh_B_complete_96bit": false,
+          "PSNR_vs_A_input": 46.145
+        }
+      ]
+    }
+  },
+  "best_checkpoint": {
+    "step": 75,
+    "score": {
+      "complete_96bit_successes": 7,
+      "minimum_bit_accuracy_pct": 91.67,
+      "mean_bit_accuracy_pct": 98.283,
+      "mean_PSNR": 46.387
+    },
+    "path": "results/prior_aug_three_changes_resume_50_to_100/checkpoint_best_prior_aug_96bit.pth"
+  },
+  "evaluation_history": [
+    {
+      "step": 50,
+      "results": {
+        "message_pair_count": 20,
+        "complete_96bit_successes": 6,
+        "complete_96bit_success_rate_pct": 30.0,
+        "mean_bit_accuracy_pct": 98.075,
+        "minimum_bit_accuracy_pct": 91.67,
+        "mean_PSNR_vs_A_input": 46.668,
+        "per_pair": [
+          {
+            "pair": 1,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.198
+          },
+          {
+            "pair": 2,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.757
+          },
+          {
+            "pair": 3,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.777
+          },
+          {
+            "pair": 4,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.363
+          },
+          {
+            "pair": 5,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 47.12
+          },
+          {
+            "pair": 6,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.46
+          },
+          {
+            "pair": 7,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.471
+          },
+          {
+            "pair": 8,
+            "fresh_B_correct_bits": 92,
+            "fresh_B_bit_accuracy_pct": 95.83,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.608
+          },
+          {
+            "pair": 9,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.793
+          },
+          {
+            "pair": 10,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.85
+          },
+          {
+            "pair": 11,
+            "fresh_B_correct_bits": 92,
+            "fresh_B_bit_accuracy_pct": 95.83,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.92
+          },
+          {
+            "pair": 12,
+            "fresh_B_correct_bits": 88,
+            "fresh_B_bit_accuracy_pct": 91.67,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.133
+          },
+          {
+            "pair": 13,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 47.078
+          },
+          {
+            "pair": 14,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.954
+          },
+          {
+            "pair": 15,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.881
+          },
+          {
+            "pair": 16,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 47.013
+          },
+          {
+            "pair": 17,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.179
+          },
+          {
+            "pair": 18,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.182
+          },
+          {
+            "pair": 19,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.856
+          },
+          {
+            "pair": 20,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.767
+          }
+        ]
+      }
+    },
+    {
+      "step": 75,
+      "results": {
+        "message_pair_count": 20,
+        "complete_96bit_successes": 7,
+        "complete_96bit_success_rate_pct": 35.0,
+        "mean_bit_accuracy_pct": 98.283,
+        "minimum_bit_accuracy_pct": 91.67,
+        "mean_PSNR_vs_A_input": 46.387,
+        "per_pair": [
+          {
+            "pair": 1,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 45.921
+          },
+          {
+            "pair": 2,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.46
+          },
+          {
+            "pair": 3,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.505
+          },
+          {
+            "pair": 4,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.09
+          },
+          {
+            "pair": 5,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.846
+          },
+          {
+            "pair": 6,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.187
+          },
+          {
+            "pair": 7,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.196
+          },
+          {
+            "pair": 8,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.303
+          },
+          {
+            "pair": 9,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.51
+          },
+          {
+            "pair": 10,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.565
+          },
+          {
+            "pair": 11,
+            "fresh_B_correct_bits": 92,
+            "fresh_B_bit_accuracy_pct": 95.83,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.646
+          },
+          {
+            "pair": 12,
+            "fresh_B_correct_bits": 88,
+            "fresh_B_bit_accuracy_pct": 91.67,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.864
+          },
+          {
+            "pair": 13,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.786
+          },
+          {
+            "pair": 14,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.656
+          },
+          {
+            "pair": 15,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.617
+          },
+          {
+            "pair": 16,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.743
+          },
+          {
+            "pair": 17,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.904
+          },
+          {
+            "pair": 18,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.916
+          },
+          {
+            "pair": 19,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.569
+          },
+          {
+            "pair": 20,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.464
+          }
+        ]
+      }
+    },
+    {
+      "step": 100,
+      "results": {
+        "message_pair_count": 20,
+        "complete_96bit_successes": 7,
+        "complete_96bit_success_rate_pct": 35.0,
+        "mean_bit_accuracy_pct": 98.282,
+        "minimum_bit_accuracy_pct": 91.67,
+        "mean_PSNR_vs_A_input": 46.096,
+        "per_pair": [
+          {
+            "pair": 1,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 45.637
+          },
+          {
+            "pair": 2,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.147
+          },
+          {
+            "pair": 3,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.225
+          },
+          {
+            "pair": 4,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.803
+          },
+          {
+            "pair": 5,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.556
+          },
+          {
+            "pair": 6,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.894
+          },
+          {
+            "pair": 7,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.914
+          },
+          {
+            "pair": 8,
+            "fresh_B_correct_bits": 92,
+            "fresh_B_bit_accuracy_pct": 95.83,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.989
+          },
+          {
+            "pair": 9,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.219
+          },
+          {
+            "pair": 10,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.265
+          },
+          {
+            "pair": 11,
+            "fresh_B_correct_bits": 92,
+            "fresh_B_bit_accuracy_pct": 95.83,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.36
+          },
+          {
+            "pair": 12,
+            "fresh_B_correct_bits": 88,
+            "fresh_B_bit_accuracy_pct": 91.67,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.585
+          },
+          {
+            "pair": 13,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.485
+          },
+          {
+            "pair": 14,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.348
+          },
+          {
+            "pair": 15,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.341
+          },
+          {
+            "pair": 16,
+            "fresh_B_correct_bits": 96,
+            "fresh_B_bit_accuracy_pct": 100.0,
+            "fresh_B_complete_96bit": true,
+            "PSNR_vs_A_input": 46.465
+          },
+          {
+            "pair": 17,
+            "fresh_B_correct_bits": 93,
+            "fresh_B_bit_accuracy_pct": 96.88,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.623
+          },
+          {
+            "pair": 18,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 45.64
+          },
+          {
+            "pair": 19,
+            "fresh_B_correct_bits": 94,
+            "fresh_B_bit_accuracy_pct": 97.92,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.271
+          },
+          {
+            "pair": 20,
+            "fresh_B_correct_bits": 95,
+            "fresh_B_bit_accuracy_pct": 98.96,
+            "fresh_B_complete_96bit": false,
+            "PSNR_vs_A_input": 46.145
+          }
+        ]
+      }
+    }
+  ]
+}
