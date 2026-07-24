@@ -1,0 +1,7 @@
+condition,frames,accuracy_A_pct,accuracy_B_pct,complete_A,complete_B,target,target_accuracy_pct,complete_target,PSNR_vs_original_dB,PSNR_vs_previous_stage_dB
+A_only,256,100.0,0.0,True,False,A,100.0,True,40.83231309447118,40.83231309447118
+B_only,256,0.0,100.0,False,True,B,100.0,True,40.82967545382119,40.82967545382119
+A_then_B,256,0.0,100.0,False,True,B,100.0,True,37.14463324394301,40.913492180509564
+B_then_A,256,100.0,0.0,True,False,A,100.0,True,37.15000137911957,40.96726080445369
+A_then_A,256,100.0,0.0,True,False,A,100.0,True,37.07630258162148,41.58630812959839
+A_transcode,256,100.0,0.0,True,False,A,100.0,True,39.9988475713542,44.10438030168579

@@ -238,35 +238,6 @@ Slot 2: B
 Slot 3: C
 ```
 
-## 6. Week 2: Prior-Watermark Augmentation
-
-### Research question
-
-Can a fresh watermark B be embedded and decoded reliably when the input video already contains an earlier watermark A, while preserving acceptable visual quality? The target is the complete 96-bit VideoSeal payload.
-
-### Method
-
-`scripts/train_prior_watermark_aug_v0.py` freezes the original VideoSeal v0.0 embedder used to create A, freezes the detector, and trains only the fresh-B embedder. Training inputs contain A with probability 1.0 and use complementary random A/B messages rather than a fixed pair. The loss combines video-level signed-margin, hardest-bit, frame BCE, and a PSNR-budget term. `fresh_strength=2.0` is retained. Checkpoints are selected on 20 held-out random message pairs by complete-96-bit success first, then accuracy and PSNR.
-
-### Final reported evaluation
-
-The selected step-75 checkpoint was evaluated on a fixed 20-pair unseen-message bank (five sampled frames; B is the complement of A):
-
-| Model | Complete 96/96 | Mean bit accuracy | Minimum bit accuracy | Mean PSNR vs A |
-|---|---:|---:|---:|---:|
-| Step 0 baseline | 2/20 (10.0%) | 96.824% | 91.67% | 47.298 dB |
-| Step 75 checkpoint | 3/20 (15.0%) | 97.814% | 93.75% | 46.417 dB |
-
-The separate checkpoint-selection bank used during the 50→100 resume run chose step 75 with 7/20 complete payloads, 98.283% mean accuracy, 91.67% minimum accuracy, and 46.387 dB mean PSNR. These are different message banks and must not be treated as the same test result.
-
-### Honest conclusion
-
-Prior-watermark augmentation improves average held-out bit accuracy and the complete-payload rate modestly, but does not yet achieve reliable 96/96 decoding on all unseen pairs. The PSNR decrease is measurable. This is a completed reproduction/prototype result, not evidence of a solved overwriting problem.
-
-PixelSeal support is implemented in `scripts/pixelseal_overwrite_experiment.py`, but the official checkpoint download/validation is pending; no PixelSeal experimental result is claimed here. RivaGAN remains a planned baseline.
-
-Detailed methods and limitations: [docs/week2_experiments.md](docs/week2_experiments.md). Environment: [docs/environment.md](docs/environment.md).
-
 Training targets:
 
 ```text
@@ -320,6 +291,56 @@ Results:
 results/multi_20/
 results/multi_20_test/
 ```
+
+## 6. Week 2: Prior-Watermark Augmentation
+
+### Research question
+
+Can a fresh watermark B be embedded and decoded reliably when the input video already contains an earlier watermark A, while preserving acceptable visual quality? The target is the complete 96-bit VideoSeal payload.
+
+### Method
+
+`scripts/train_prior_watermark_aug_v0.py` freezes the original VideoSeal v0.0 embedder used to create A, freezes the detector, and trains only the fresh-B embedder. Training inputs contain A with probability 1.0 and use complementary random A/B messages rather than a fixed pair. The loss combines video-level signed-margin, hardest-bit, frame BCE, and a PSNR-budget term. `fresh_strength=2.0` is retained. Checkpoints are selected on 20 held-out random message pairs by complete-96-bit success first, then accuracy and PSNR.
+
+### Final reported evaluation
+
+The selected step-75 checkpoint was evaluated on a fixed 20-pair unseen-message bank (five sampled frames; B is the complement of A):
+
+| Model | Complete 96/96 | Mean bit accuracy | Minimum bit accuracy | Mean PSNR vs A |
+|---|---:|---:|---:|---:|
+| Step 0 baseline | 2/20 (10.0%) | 96.824% | 91.67% | 47.298 dB |
+| Step 75 checkpoint | 3/20 (15.0%) | 97.814% | 93.75% | 46.417 dB |
+
+The separate checkpoint-selection bank used during the 50→100 resume run chose step 75 with 7/20 complete payloads, 98.283% mean accuracy, 91.67% minimum accuracy, and 46.387 dB mean PSNR. These are different message banks and must not be treated as the same test result.
+
+### Honest conclusion
+
+Prior-watermark augmentation improves average held-out bit accuracy and the complete-payload rate modestly, but does not yet achieve reliable 96/96 decoding on all unseen pairs. The PSNR decrease is measurable. This is a completed reproduction/prototype result, not evidence of a solved overwriting problem.
+
+Detailed methods and limitations: [docs/week2_experiments.md](docs/week2_experiments.md). Environment: [docs/environment.md](docs/environment.md).
+
+## 7. PixelSeal Native-Payload Reproduction
+
+`scripts/pixelseal_overwrite_experiment.py` loads the official PixelSeal model
+and evaluates its native 256-bit payload on all 256 frames of the example
+video. The validated checkpoint is 1,237,429,197 bytes and loads with all
+state-dict keys matched. A is random (seed 2025), and B is its bitwise
+complement.
+
+| Condition | Target recovered | Complete target | PSNR vs original | PSNR vs previous stage |
+|---|---:|---:|---:|---:|
+| A only | 256/256 | yes | 40.832 dB | 40.832 dB |
+| B only | 256/256 | yes | 40.830 dB | 40.830 dB |
+| A then B | 256/256 B, 0/256 A | yes | 37.145 dB | 40.913 dB |
+| B then A | 256/256 A, 0/256 B | yes | 37.150 dB | 40.967 dB |
+| A then A | 256/256 | yes | 37.076 dB | 41.586 dB |
+| A + H.264 transcode | 256/256 | yes | 39.999 dB | 44.104 dB |
+
+For this video and message pair, PixelSeal decodes the most recently embedded
+message perfectly in both overwrite directions. This is strong evidence of
+last-write dominance under the model's temporally pooled detector, not evidence
+that two independently decodable payloads coexist. Results are in
+`results/pixelseal_overwrite/`. RivaGAN remains a planned baseline.
 
 ## Repository Structure
 
